@@ -38,6 +38,13 @@ EOF
         "logs:PutLogEvents"
       ],
       "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": "*"
     }
   ]
 }
