@@ -2,7 +2,9 @@ import os
 import boto3
 
 ID_RSA_PATH='/tmp/id_rsa'
-REPO_PATH='/tmp/ssh_in_aws_lambda'
+REPO_URL=os.getenv('REPO_TO_DOWNLOAD')
+REPO_PATH='/tmp/{}'.format(REPO_URL)
+
 secretsmanager = boto3.client('secretsmanager')
 
 def get_secret(secret_id):
@@ -23,5 +25,5 @@ def retrieve_and_save_ssh_key():
 def handler(event, context):
     retrieve_and_save_ssh_key()
 
-    os.system('git clone git@github.com/{} {}'.format(os.getenv('REPO_TO_DOWNLOAD'), REPO_PATH))
+    os.system('git clone {} {}'.format(REPO_URL, REPO_PATH))
     os.system('tree {}'.format(REPO_PATH))

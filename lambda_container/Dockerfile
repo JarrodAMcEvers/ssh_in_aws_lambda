@@ -1,11 +1,10 @@
-FROM public.ecr.aws/lambda/python:3.8
+FROM public.ecr.aws/lambda/python:3.9
 
 # Install unzip for lambda layer
 RUN yum upgrade -y \
     && yum install unzip -y
 
 # Only needed for local testing purposes
-# AWS provides boto3 for the lambda container to use without having to install it
 RUN pip install boto3
 
 # Copy lambda layer code
