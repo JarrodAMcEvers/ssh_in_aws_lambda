@@ -37,9 +37,10 @@ resource "aws_lambda_function" "ssh_in_container" {
 
   environment {
     variables = {
-      SSH_KEY_SECRET_ID      = aws_secretsmanager_secret.ssh_key.id
-      # needed so that we can use the lambda layer ssh brought in
-      GIT_SSH_COMMAND = "/opt/bin/ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa"
+        REPO_TO_DOWNLOAD  = "jarrodamcevers/ssh_in_aws_lambda"
+        SSH_KEY_SECRET_ID = aws_secretsmanager_secret.ssh_key.id
+        # needed so that we can use the lambda layer ssh brought in
+        GIT_SSH_COMMAND   = "/opt/bin/ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa"
     }
   }
 }
