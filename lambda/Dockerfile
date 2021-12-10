@@ -10,7 +10,7 @@ RUN pip install boto3
 # Copy lambda layer code
 # Lambda layer needs to reside in the /opt directory
 WORKDIR /opt
-COPY /tmp/git_lambda_layer.tar /opt/
+COPY git_lambda_layer.tar /opt/
 RUN unzip git_lambda_layer.tar && rm git_lambda_layer.tar
 
 # Copy function code
