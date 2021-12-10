@@ -1,6 +1,6 @@
 resource "aws_security_group" "ssh_lambda" {
-  name        = "ssh-lambdas"
-  vpc_id      = var.vpc_id
+  name   = "ssh-lambdas"
+  vpc_id = var.vpc_id
 }
 
 resource "aws_security_group_rule" "lambda_ssh_egress" {
@@ -10,5 +10,15 @@ resource "aws_security_group_rule" "lambda_ssh_egress" {
   to_port           = 22
   from_port         = 22
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/32"]
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "lambda_https_egress" {
+  security_group_id = aws_security_group.ssh_lambda.id
+  type              = "egress"
+  description       = "HTTPS"
+  to_port           = 443
+  from_port         = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
 }
