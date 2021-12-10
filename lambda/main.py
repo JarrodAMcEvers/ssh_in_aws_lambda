@@ -17,6 +17,7 @@ def retrieve_and_save_ssh_key():
     os.chmod(ID_RSA_PATH, 0o400)
 
 def handler(event, context):
+    os.system('rm -rf /tmp/*')
     # this line will fail for the lambda function that has the default ssh
     os.system('ssh -vT git@github.com')
 
