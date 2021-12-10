@@ -17,6 +17,9 @@ def retrieve_and_save_ssh_key():
     os.chmod(ID_RSA_PATH, 0o400)
 
 def handler(event, context):
+    # delete everything in /tmp
+    # if the lambda is hot, the function will not be able to reuse it because of the permissions
+    # plus, this gets rid of the cloned repo
     os.system('rm -rf /tmp/*')
     # this line will fail for the lambda function that has the default ssh
     os.system('ssh -vT git@github.com')
@@ -24,4 +27,4 @@ def handler(event, context):
     retrieve_and_save_ssh_key()
 
     os.system('git clone {} {}'.format(REPO_URL, REPO_PATH))
-    os.system('tree {}'.format(REPO_PATH))
+    os.system('ls -la {}'.format(REPO_PATH))
