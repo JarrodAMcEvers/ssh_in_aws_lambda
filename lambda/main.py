@@ -21,7 +21,7 @@ def retrieve_and_save_ssh_key():
     os.chmod(ID_RSA_PATH, 0o400)
 
 def handler(event, context):
-    if os.getenv('DEBUG_SSH', None).lower() == 'true':
+    if os.getenv('DEBUG_SSH', '').lower() == 'true':
         show_ssh_github()
 
     # delete everything in /tmp

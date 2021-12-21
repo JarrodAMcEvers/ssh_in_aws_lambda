@@ -32,6 +32,7 @@ resource "aws_lambda_function" "default_ssh" {
       SSH_KEY_SECRET_ID = aws_secretsmanager_secret.ssh_key.id
       REPO_TO_DOWNLOAD  = "git@github.com:JarrodAMcEvers/ssh_in_aws_lambda.git"
       GIT_SSH_COMMAND   = "ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa"
+      DEBUG_SSH         = "true"
     }
   }
 }
@@ -79,8 +80,7 @@ resource "aws_lambda_function" "ssh_in_container" {
     variables = {
       REPO_TO_DOWNLOAD  = "git@github.com:JarrodAMcEvers/ssh_in_aws_lambda.git"
       SSH_KEY_SECRET_ID = aws_secretsmanager_secret.ssh_key.id
-      # needed so that we can use the lambda layer ssh brought in
-      GIT_SSH_COMMAND = "/opt/bin/ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa"
+      GIT_SSH_COMMAND   = "ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa"
     }
   }
 }
