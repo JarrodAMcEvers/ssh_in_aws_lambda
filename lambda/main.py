@@ -3,7 +3,7 @@ import boto3
 
 ID_RSA_PATH='/tmp/id_rsa'
 REPO_URL=os.getenv('REPO_TO_DOWNLOAD')
-REPO_PATH='/tmp/{}'.format(REPO_URL)
+REPO_PATH='/tmp/{}'.format(REPO_URL.split('/')[-1].split('.')[0])
 
 secretsmanager = boto3.client('secretsmanager')
 
@@ -18,13 +18,22 @@ def retrieve_and_save_ssh_key():
 
 def handler(event, context):
     # delete everything in /tmp
-    # if the lambda is hot, the function will not be able to reuse it because of the permissions
-    # plus, this gets rid of the cloned repo
+    # if the lambda is still running when the next execution happens, the function will not be able to reuse the private key because of the permissions
     os.system('rm -rf /tmp/*')
+
+    print('printing tmp dir')
+    os.system('ls /tmp'.format())
+    print('\n')
+
     # this line will fail for the lambda function that has the default ssh
     os.system('ssh -vT git@github.com')
 
     retrieve_and_save_ssh_key()
 
+    print('cloning repo')
     os.system('git clone {} {}'.format(REPO_URL, REPO_PATH))
-    os.system('ls -la {}'.format(REPO_PATH))
+    print('\n')
+
+    print('printing repo dir')
+    os.system('ls {}'.format(REPO_PATH))
+    print('\n')
