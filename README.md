@@ -8,3 +8,13 @@ cd lambda
 cd ../terraform
 terraform apply -var-file vars.tfvars
 ```
+You will need to supply your own `vars.tfvars` file. The only variables needed for the terraform is `vpc_id` and `subnets`.
+
+Here is an example:
+```txt
+vpc_id = "vpc-xxxxxxxx"
+subnets = [
+  "subnet-a",
+  "subnet-b"
+]
+```
