@@ -1,0 +1,38 @@
+# stage 1/2 of build
+ARG FUNCTION_DIR="/function"
+
+FROM python:buster as build-image
+
+# install aws-lambda-cpp build dependencies
+# https://github.com/awslabs/aws-lambda-cpp
+RUN apt-get update && \
+    apt-get install -y \
+    g++ \
+    make \
+    cmake \
+    unzip \
+    libcurl4-openssl-dev
+
+# include global arg
+ARG FUNCTION_DIR
+RUN mkdir -p ${FUNCTION_DIR}
+COPY main.py ${FUNCTION_DIR}
+
+# install the runtime interface client to run lambda function in custom os
+RUN pip install \
+    --target ${FUNCTION_DIR} \
+    awslambdaric
+
+
+# stage 2 of build
+FROM python:buster
+
+RUN pip install boto3
+# include global arg
+ARG FUNCTION_DIR
+WORKDIR ${FUNCTION_DIR}
+# copy from stage 1 docker image
+COPY --from=build-image ${FUNCTION_DIR} ${FUNCTION_DIR}
+
+ENTRYPOINT [ "/usr/local/bin/python", "-m", "awslambdaric" ]
+CMD [ "main.handler" ]
