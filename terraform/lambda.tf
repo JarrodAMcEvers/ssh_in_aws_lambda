@@ -2,8 +2,17 @@ data "aws_ecr_repository" "ssh_lambda" {
   name = "ssh_lambda"
 }
 
+data "aws_ecr_repository" "ssh_lambda_custom_os" {
+  name = "ssh_lambda_custom_os"
+}
+
 data "aws_ecr_image" "ssh_lambda" {
-  repository_name = "ssh_lambda"
+  repository_name = data.aws_ecr_repository.ssh_lambda.name
+  image_tag       = "latest"
+}
+
+data "aws_ecr_image" "ssh_lambda_custom_os" {
+  repository_name = data.aws_ecr_repository.ssh_lambda_custom_os.name
   image_tag       = "latest"
 }
 
@@ -31,7 +40,7 @@ resource "aws_lambda_function" "default_ssh" {
     variables = {
       SSH_KEY_SECRET_ID = aws_secretsmanager_secret.ssh_key.id
       REPO_TO_DOWNLOAD  = "git@github.com:JarrodAMcEvers/ssh_in_aws_lambda.git"
-      GIT_SSH_COMMAND   = "ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa"
+      GIT_SSH_COMMAND   = "ssh -o UserKnownHostsFile=/tmp/known_hosts -i /tmp/id_rsa"
       DEBUG_SSH         = "true"
     }
   }
@@ -58,7 +67,7 @@ resource "aws_lambda_function" "working_ssh" {
     variables = {
       SSH_KEY_SECRET_ID = aws_secretsmanager_secret.ssh_key.id
       REPO_TO_DOWNLOAD  = "git@github.com:JarrodAMcEvers/ssh_in_aws_lambda.git"
-      GIT_SSH_COMMAND   = "ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa"
+      GIT_SSH_COMMAND   = "ssh -o UserKnownHostsFile=/tmp/known_hosts -i /tmp/id_rsa"
     }
   }
 }
@@ -80,7 +89,29 @@ resource "aws_lambda_function" "ssh_in_container" {
     variables = {
       REPO_TO_DOWNLOAD  = "git@github.com:JarrodAMcEvers/ssh_in_aws_lambda.git"
       SSH_KEY_SECRET_ID = aws_secretsmanager_secret.ssh_key.id
-      GIT_SSH_COMMAND   = "ssh -o StrictHostKeyChecking=no -i /tmp/id_rsa"
+      GIT_SSH_COMMAND   = "ssh -o UserKnownHostsFile=/tmp/known_hosts -i /tmp/id_rsa"
+    }
+  }
+}
+
+resource "aws_lambda_function" "ssh_in_container_custom_os" {
+  function_name = "working_ssh_in_a_custom_os_container"
+  role          = aws_iam_role.lambda.arn
+  image_uri     = "${data.aws_ecr_repository.ssh_lambda_custom_os.repository_url}@${data.aws_ecr_image.ssh_lambda_custom_os.image_digest}"
+  package_type  = "Image"
+  timeout       = 300
+  memory_size   = 256
+
+  vpc_config {
+    security_group_ids = [aws_security_group.ssh_lambda.id]
+    subnet_ids         = var.subnets
+  }
+
+  environment {
+    variables = {
+      REPO_TO_DOWNLOAD  = "git@github.com:JarrodAMcEvers/ssh_in_aws_lambda.git"
+      SSH_KEY_SECRET_ID = aws_secretsmanager_secret.ssh_key.id
+      GIT_SSH_COMMAND   = "ssh -o UserKnownHostsFile=/tmp/known_hosts -i /tmp/id_rsa"
     }
   }
 }
