@@ -5,6 +5,7 @@ export AWS_DEFAULT_REGION
 TAG="latest"
 IMAGE="ssh_lambda"
 CUSTOM_OS_IMAGE="ssh_lambda_custom_os"
+PARAMIKO_IMAGE="paramiko"
 ACCOUNT_NUMBER=$(aws sts get-caller-identity | jq -r .Account)
 ECR_URL="${ACCOUNT_NUMBER}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
 
@@ -22,6 +23,13 @@ if ! aws ecr describe-repositories | jq --arg repo_name $CUSTOM_OS_IMAGE '.repos
     aws ecr create-repository --repository-name $CUSTOM_OS_IMAGE
 fi
 
+if ! aws ecr describe-repositories | jq --arg repo_name $PARAMIKO_IMAGE '.repositories[] | select(.repositoryName | contains($repo_name))' -e >> /dev/null; then
+    echo "####################################"
+    echo "Creating $PARAMIKO ECR repo"
+    echo "####################################"
+    aws ecr create-repository --repository-name $PARAMIKO_IMAGE
+fi
+
 if test ! -f git_lambda_layer.tar; then
     echo "####################################"
     echo "Download git lambda layer"
@@ -34,6 +42,7 @@ echo "Building images"
 echo "####################################"
 docker build -t ${IMAGE}:${TAG} .
 docker build -t ${CUSTOM_OS_IMAGE}:${TAG} . --file Dockerfile_custom_os
+docker build -t ${PARAMIKO_IMAGE}:${TAG} . --file Dockerfile_paramiko
 
 aws ecr get-login-password | docker login --username AWS --password-stdin $ECR_URL
 
@@ -46,3 +55,5 @@ docker image push ${ECR_URL}/${IMAGE}:${TAG}
 docker tag ${CUSTOM_OS_IMAGE}:${TAG} ${ECR_URL}/${CUSTOM_OS_IMAGE}:${TAG}
 docker image push ${ECR_URL}/${CUSTOM_OS_IMAGE}:${TAG}
 
+docker tag ${PARAMIKO_IMAGE}:${TAG} ${ECR_URL}/${PARAMIKO_IMAGE}:${TAG}
+docker image push ${ECR_URL}/${PARAMIKO_IMAGE}:${TAG}
