@@ -46,6 +46,15 @@ EOF
       ],
       "Resource": "*"
     }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:HeadObject",
+        "s3:GetObject"
+      ],
+      "Resource": "*"
+    }
   ]
 }
 EOF
