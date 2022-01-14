@@ -6,6 +6,10 @@ data "aws_ecr_repository" "ssh_lambda_custom_os" {
   name = "ssh_lambda_custom_os"
 }
 
+data "aws_ecr_repository" "paramiko" {
+  name = "paramiko"
+}
+
 data "aws_ecr_image" "ssh_lambda" {
   repository_name = data.aws_ecr_repository.ssh_lambda.name
   image_tag       = "latest"
@@ -13,6 +17,11 @@ data "aws_ecr_image" "ssh_lambda" {
 
 data "aws_ecr_image" "ssh_lambda_custom_os" {
   repository_name = data.aws_ecr_repository.ssh_lambda_custom_os.name
+  image_tag       = "latest"
+}
+
+data "aws_ecr_image" "paramiko" {
+  repository_name = data.aws_ecr_repository.paramiko.name
   image_tag       = "latest"
 }
 
@@ -112,6 +121,29 @@ resource "aws_lambda_function" "ssh_in_container_custom_os" {
       REPO_TO_DOWNLOAD  = "git@github.com:JarrodAMcEvers/ssh_in_aws_lambda.git"
       SSH_KEY_SECRET_ID = aws_secretsmanager_secret.ssh_key.id
       GIT_SSH_COMMAND   = "ssh -o UserKnownHostsFile=/tmp/known_hosts -i /tmp/id_rsa"
+    }
+  }
+}
+
+resource "aws_lambda_function" "paramiko_container" {
+  function_name = "paramiko_container"
+  role          = aws_iam_role.lambda.arn
+  image_uri     = "${data.aws_ecr_repository.paramiko.repository_url}@${data.aws_ecr_image.paramiko.image_digest}"
+  package_type  = "Image"
+  timeout       = 300
+  memory_size   = 256
+
+  vpc_config {
+    security_group_ids = [aws_security_group.ssh_lambda.id]
+    subnet_ids         = var.subnets
+  }
+
+  environment {
+    variables = {
+      IP_ADDRESS        = "172.30.193.168"
+      PEM_KEY_SECRET_ID = aws_secretsmanager_secret.pem_key.id
+      S3_BUCKET         = var.s3_bucket
+      OBJECT_PATH       = var.object_path
     }
   }
 }
