@@ -18,11 +18,10 @@ ARG FUNCTION_DIR
 RUN mkdir -p ${FUNCTION_DIR}
 COPY main.py ${FUNCTION_DIR}
 
-# install the runtime interface client to run lambda function in custom os
+# install the runtime interface client that allows getting from and sending requests to the Lambda service
 RUN pip install \
     --target ${FUNCTION_DIR} \
     awslambdaric
-
 
 # stage 2 of build
 FROM python:buster
