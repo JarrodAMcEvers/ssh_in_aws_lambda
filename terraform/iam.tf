@@ -44,8 +44,7 @@ EOF
       "Action": [
         "secretsmanager:GetSecretValue"
       ],
-      "Resource": "${aws_secretsmanager_secret.ssh_key.ssh_key.arn}"
-    }
+      "Resource": "${aws_secretsmanager_secret.ssh_key.arn}"
     },
     {
       "Effect": "Allow",
