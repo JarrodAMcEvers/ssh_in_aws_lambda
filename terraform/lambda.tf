@@ -140,10 +140,10 @@ resource "aws_lambda_function" "paramiko_container" {
 
   environment {
     variables = {
-      IP_ADDRESS        = "172.30.193.168"
-      PEM_KEY_SECRET_ID = aws_secretsmanager_secret.pem_key.id
-      S3_BUCKET         = var.s3_bucket
-      OBJECT_PATH       = var.object_path
+      REMOTE_HOST = var.remote_host_address
+      REMOTE_USER = var.remote_user
+      S3_BUCKET   = var.s3_bucket
+      OBJECT_PATH = var.object_path
     }
   }
 }

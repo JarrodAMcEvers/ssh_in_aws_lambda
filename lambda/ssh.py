@@ -12,13 +12,13 @@ def handler(event, context):
 
     s3_client.download_file(os.getenv('S3_BUCKET'), os.getenv('OBJECT_PATH'), KEY_PATH)
 
-    host = os.getenv('IP_ADDRESS')
+    host = os.getenv('REMOTE_HOST')
     key = paramiko.RSAKey.from_private_key_file(KEY_PATH)
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     
-    print('sshing into remote host')
-    client.connect(hostname=host, username="ubuntu", pkey=key)
+    print('sshing into remote host {}'.format(host))
+    client.connect(hostname=host, username=os.getenv('REMOTE_USER'), pkey=key)
 
     # run some commands on the remote host    
     for command in ['whoami', 'curl http://checkip.amazonaws.com']:
