@@ -140,10 +140,12 @@ resource "aws_lambda_function" "paramiko_container" {
 
   environment {
     variables = {
-      REMOTE_HOST = var.remote_host_address
-      REMOTE_USER = var.remote_user
-      S3_BUCKET   = var.s3_bucket
-      OBJECT_PATH = var.object_path
+      REMOTE_HOST  = var.remote_host_address
+      REMOTE_USER  = var.remote_user
+      S3_BUCKET    = var.s3_bucket
+      PEM_KEY_PATH = var.pem_key_path
     }
   }
+
+  count = var.remote_ssh_lambda_enabled == true ? 1 : 0
 }

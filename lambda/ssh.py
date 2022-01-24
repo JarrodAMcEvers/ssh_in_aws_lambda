@@ -10,7 +10,7 @@ def handler(event, context):
     # if the lambda is still running when the next execution happens, the function will not be able to reuse the private key because of the permissions
     os.system('rm -rf /tmp/*')
 
-    s3_client.download_file(os.getenv('S3_BUCKET'), os.getenv('OBJECT_PATH'), KEY_PATH)
+    s3_client.download_file(os.getenv('S3_BUCKET'), os.getenv('PEM_KEY_PATH'), KEY_PATH)
 
     host = os.getenv('REMOTE_HOST')
     key = paramiko.RSAKey.from_private_key_file(KEY_PATH)
