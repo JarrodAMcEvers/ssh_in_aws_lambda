@@ -13,6 +13,8 @@ List of AWS lambda functions that get created:
 1. AWS CLI
 1. AWS credentials
 1. Docker + CLI
+1. cURL
+1. [jq](https://github.com/stedolan/jq) command-line tool
 
 ## Quickstart to deploy the things
 ```bash
