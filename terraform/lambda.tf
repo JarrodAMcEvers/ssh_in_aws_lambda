@@ -1,13 +1,13 @@
 data "aws_ecr_repository" "ssh_lambda" {
-  name = "ssh_lambda"
+  name = "git_ssh_lambda"
 }
 
 data "aws_ecr_repository" "ssh_lambda_custom_os" {
-  name = "ssh_lambda_custom_os"
+  name = "git_ssh_lambda_custom_os"
 }
 
 data "aws_ecr_repository" "paramiko" {
-  name = "paramiko"
+  name = "paramiko_ssh_lambda"
 }
 
 data "aws_ecr_image" "ssh_lambda" {

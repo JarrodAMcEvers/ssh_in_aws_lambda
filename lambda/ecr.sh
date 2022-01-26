@@ -3,32 +3,24 @@ AWS_DEFAULT_REGION=${1:-"us-east-1"}
 export AWS_DEFAULT_REGION
 
 TAG="latest"
-IMAGE="ssh_lambda"
-CUSTOM_OS_IMAGE="ssh_lambda_custom_os"
-PARAMIKO_IMAGE="paramiko"
+IMAGE="git_ssh_lambda"
+CUSTOM_OS_IMAGE="git_ssh_lambda_custom_os"
+PARAMIKO_IMAGE="paramiko_ssh_lambda"
 ACCOUNT_NUMBER=$(aws sts get-caller-identity | jq -r .Account)
 ECR_URL="${ACCOUNT_NUMBER}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
 
-if ! aws ecr describe-repositories | jq --arg repo_name $IMAGE '.repositories[] | select(.repositoryName | contains($repo_name))' -e >> /dev/null; then
-    echo "####################################"
-    echo "Creating $IMAGE ECR repo"
-    echo "####################################"
-    aws ecr create-repository --repository-name $IMAGE
-fi
+function create_ecr_repo() {
+    if ! aws ecr describe-repositories | jq --arg repo_name $1 '.repositories[] | select(.repositoryName | contains($repo_name))' -e >> /dev/null; then
+        echo "####################################"
+        echo "Creating $1 ECR repo"
+        echo "####################################"
+        aws ecr create-repository --repository-name $1
+    fi
+}
 
-if ! aws ecr describe-repositories | jq --arg repo_name $CUSTOM_OS_IMAGE '.repositories[] | select(.repositoryName | contains($repo_name))' -e >> /dev/null; then
-    echo "####################################"
-    echo "Creating $CUSTOM_OS_IMAGE ECR repo"
-    echo "####################################"
-    aws ecr create-repository --repository-name $CUSTOM_OS_IMAGE
-fi
-
-if ! aws ecr describe-repositories | jq --arg repo_name $PARAMIKO_IMAGE '.repositories[] | select(.repositoryName | contains($repo_name))' -e >> /dev/null; then
-    echo "####################################"
-    echo "Creating $PARAMIKO ECR repo"
-    echo "####################################"
-    aws ecr create-repository --repository-name $PARAMIKO_IMAGE
-fi
+create_ecr_repo $IMAGE
+create_ecr_repo $CUSTOM_OS_IMAGE
+create_ecr_repo $PARAMIKO_IMAGE
 
 if test ! -f git_lambda_layer.tar; then
     echo "####################################"
