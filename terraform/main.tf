@@ -15,11 +15,13 @@ variable "subnets" {
 variable "s3_bucket" {
   type        = string
   description = "S3 bucket name where the pem key lives"
+  default     = ""
 }
 
 variable "pem_key_path" {
   type        = string
   description = "Object path of pem key in the S3 bucket mentioned above"
+  default     = ""
 }
 
 variable "remote_host_address" {
