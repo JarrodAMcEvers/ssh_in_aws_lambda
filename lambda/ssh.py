@@ -21,7 +21,7 @@ def handler(event, context):
     client.connect(hostname=host, username=os.getenv('REMOTE_USER'), pkey=key)
 
     # run some commands on the remote host    
-    for command in ['whoami', 'curl http://checkip.amazonaws.com']:
+    for command in ['whoami', 'curl http://checkip.amazonaws.com', 'echo $SSH_CLIENT']:
         print('running command: {}'.format(command))
         stdin, out, err = client.exec_command(command)
         print('stderr', err.read())
