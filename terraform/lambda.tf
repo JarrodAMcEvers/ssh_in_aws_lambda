@@ -126,7 +126,7 @@ resource "aws_lambda_function" "ssh_in_container_custom_os" {
 }
 
 resource "aws_lambda_function" "paramiko_container" {
-  function_name = "paramiko_container"
+  function_name = "paramiko_ssh_container"
   role          = aws_iam_role.lambda.arn
   image_uri     = "${data.aws_ecr_repository.paramiko.repository_url}@${data.aws_ecr_image.paramiko.image_digest}"
   package_type  = "Image"
